@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trust Builder: A Betfair Trust Framework Game</title>
+    <style>
+        :root {
+            --primary: #008000;
+            --primary-dark: #006400;
+            --secondary: #FFA500;
+            --dark: #333;
+            --light: #f4f4f4;
+            --danger: #e74c3c;
+            --success: #2ecc71;
+            --info: #3498db;
+            --warning: #f39c12;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: var(--primary);
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        h2 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: var(--primary-dark);
+        }
+        
+        h3 {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+        }
+        
+        .game-layout {
+            display: flex;
+            gap: 30px;
+        }
+        
+        .game-main {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .customer-feedback-panel {
+            width: 350px;
+            flex-shrink: 0;
+        }
+        
+        .game-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .trust-pillar {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .pillar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .pillar-score {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .trust-meter {
+            height: 20px;
+            background-color: #ddd;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+        
+        .trust-fill {
+            height: 100%;
+            background-color: var(--primary);
+            width: 50%;
+            transition: width 0.5s ease;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card h4 {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: var(--primary-dark);
+        }
+        
+        .card p {
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+        
+        .card-effects {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        .card-effects span {
+            margin-right: 8px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s ease;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #e69500;
+        }
+        
+        .stats-panel {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .challenge-card {
+            background: var(--warning);
+            color: white;
+        }
+        
+        .event-log {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            height: 200px;
+            overflow-y: auto;
+        }
+        
+        .event-log p {
+            margin-bottom: 5px;
+            padding: 5px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .resource-counter {
+            display: flex;
+            align-items: center;
+            margin-right: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .resource-counter span {
+            font-weight: bold;
+            margin-left: 5px;
+        }
+        
+        .initiative-cards {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 30px;
+        }
+                
+        .customer-chat {
+            background: #f5f5f5;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            height: calc(100vh - 160px);
+            overflow-y: auto;
+            position: sticky;
+            top: 20px;
+        }
+        
+        .chat-message {
+            display: flex;
+            margin-bottom: 15px;
+        }
+        
+        .chat-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #ddd;
+            margin-right: 10px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .chat-bubble {
+            background: white;
+            border-radius: 18px;
+            padding: 10px 15px;
+            max-width: 80%;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        
+        .chat-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .trust-change {
+            display: inline-block;
+            padding: 3px 6px;
+            border-radius: 4px;
+            margin-left: 8px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .trust-up {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .trust-down {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .trust-neutral {
+            background-color: #ddd;
+            color: var(--dark);
+        }
+        
+        @media (max-width: 1200px) {
+            .game-layout {
+                flex-direction: column;
+            }
+            
+            .customer-feedback-panel {
+                width: 100%;
+            }
+            
+            .customer-chat {
+                height: 350px;
+                position: static;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>TRUST BUILDER</h1>
+        <p>Based on the Betfair Trust Framework</p>
+    </header>
+    
+    <div class="container">
+        <div class="game-layout">
+            <div class="game-main">
+                <div class="game-controls">
+                    <div>
+                        <div class="resource-counter">
+                            Resources: <span id="resources">10</span>
+                        </div>
+                        <div class="resource-counter">
+                            Profit: <span id="profit">100</span>
+                        </div>
+                        <div class="resource-counter">
+                            Customers: <span id="customers">1000</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="resource-counter">
+                            Overall Trust: <span id="trust">50</span>%
+                        </div>
+                        <div class="resource-counter">
+                            Round: <span id="round">1</span>/8
+                        </div>
+                    </div>
+                    <div>
+                        <button id="next-round-btn" class="btn btn-primary">Next Round</button>
+                        <button id="help-btn" class="btn btn-secondary">Help</button>
+                    </div>
+                </div>
+                
+                <div class="stats-panel">
+                    <h3>Current Challenge</h3>
+                    <div id="current-challenge" class="card challenge-card">
+                        <h4>Starting Round</h4>
+                        <p>Welcome to Trust Builder! Your goal is to build the most trusted betting brand while maintaining profitability.</p>
+                        <div class="card-effects">
+                            <span>Effect: None</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <h2>Trust Pillars</h2>
+                <div class="game-board">
+                    <div class="trust-pillar">
+                        <div class="pillar-header">
+                            <h3>Product & Play Experience</h3>
+                            <div class="pillar-score" id="pillar1-score">50%</div>
+                        </div>
+                        <div class="trust-meter">
+                            <div class="trust-fill" id="pillar1-fill"></div>
+                        </div>
+                        <p>Focus areas: Game Fairness, Payment Experience, Platform Security</p>
+                    </div>
+                    
+                    <div class="trust-pillar">
+                        <div class="pillar-header">
+                            <h3>Ethics & Integrity</h3>
+                            <div class="pillar-score" id="pillar2-score">50%</div>
+                        </div>
+                        <div class="trust-meter">
+                            <div class="trust-fill" id="pillar2-fill"></div>
+                        </div>
+                        <p>Focus areas: Ethical Culture, Regulatory Compliance, Marketing Integrity</p>
+                    </div>
+                    
+                    <div class="trust-pillar">
+                        <div class="pillar-header">
+                            <h3>Societal Contribution</h3>
+                            <div class="pillar-score" id="pillar3-score">50%</div>
+                        </div>
+                        <div class="trust-meter">
+                            <div class="trust-fill" id="pillar3-fill"></div>
+                        </div>
+                        <p>Focus areas: Player Wellbeing, Safer Gambling, Environmental & Social Governance</p>
+                    </div>
+                    
+                    <div class="trust-pillar">
+                        <div class="pillar-header">
+                            <h3>Community Engagement</h3>
+                            <div class="pillar-score" id="pillar4-score">50%</div>
+                        </div>
+                        <div class="trust-meter">
+                            <div class="trust-fill" id="pillar4-fill"></div>
+                        </div>
+                        <p>Focus areas: Industry Reputation, Customer Community, Sponsorships</p>
+                    </div>
+                </div>
+                
+                <h2>Available Initiatives <span id="actions-left">(3 actions remaining)</span></h2>
+                <div class="initiative-cards" id="initiatives">
+                    <!-- Cards will be generated by JavaScript -->
+                </div>
+                
+                <div class="event-log" id="event-log">
+                    <h3>Event Log</h3>
+                    <div id="log-content">
+                        <p>Welcome to Trust Builder! Your goal is to build the most trusted betting brand while maintaining profitability.</p>
+                        <p>The game runs for 8 rounds (2 business years). Implement initiatives to build trust with customers.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="customer-feedback-panel">
+                <h2>Customer Feedback</h2>
+                <div class="customer-chat" id="customer-chat">
+                    <div class="chat-message">
+                        <div class="chat-avatar">D</div>
+                        <div>
+                            <div class="chat-name">David (Regular Player)</div>
+                            <div class="chat-bubble">I've been using betting sites for years. Looking forward to seeing what you'll do differently.</div>
+                        </div>
+                    </div>
+                    <div class="chat-message">
+                        <div class="chat-avatar">S</div>
+                        <div>
+                            <div class="chat-name">Sarah (Casual Player)</div>
+                            <div class="chat-bubble">I'm a bit skeptical about betting companies in general. Show me why I should trust you.</div>
+                        </div>
+                    </div>
+                    <div class="chat-message">
+                        <div class="chat-avatar">J</div>
+                        <div>
+                            <div class="chat-name">James (New Player)</div>
+                            <div class="chat-bubble">I'm new to betting and still figuring things out. Clear explanations would help build my confidence.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game state
+        const gameState = {
+            resources: 10,
+            profit: 100,
+            customers: 1000,
+            trust: 50,
+            round: 1,
+            actionsLeft: 3,
+            pillars: {
+                1: 50, // Product
+                2: 50, // Ethics  
+                3: 50, // Societal
+                4: 50  // Community
+            },
+            playedCards: [],
+            challengeHistory: []
+        };
+        
+        // Card data
+        const cardData = [
+            {
+                id: 1,
+                title: "Transparent RTP Stats",
+                description: "Publish real-time return-to-player statistics on all games.",
+                cost: 2,
+                pillar: 1,
+                trust: 10,
+                profit: -5
+            },
+            {
+                id: 2,
+                title: "Express Withdrawals",
+                description: "Implement same-day withdrawals with no questions asked.",
+                cost: 3,
+                pillar: 1,
+                trust: 15,
+                profit: -10
+            },
+            {
+                id: 3,
+                title: "Platform Security Audit",
+                description: "Conduct and publish a third-party security audit of your platform.",
+                cost: 4,
+                pillar: 1,
+                trust: 12,
+                profit: -8
+            },
+            {
+                id: 4,
+                title: "Clear T&Cs",
+                description: "Simplify terms and conditions to plain language and highlight key points.",
+                cost: 1,
+                pillar: 2,
+                trust: 8,
+                profit: -2
+            },
+            {
+                id: 5,
+                title: "Responsive Support",
+                description: "Create 24/7 customer support with 1-hour response guarantee.",
+                cost: 3,
+                pillar: 2,
+                trust: 12,
+                profit: -8
+            },
+            {
+                id: 6,
+                title: "Ethical Marketing Pledge",
+                description: "Commit to and publish ethical marketing guidelines that avoid targeting vulnerable groups.",
+                cost: 2,
+                pillar: 2,
+                trust: 10,
+                profit: -5
+            },
+            {
+                id: 7,
+                title: "Safer Gambling Alliance",
+                description: "Lead industry initiative for protection standards, particularly for under-25s.",
+                cost: 4,
+                pillar: 3,
+                trust: 20,
+                profit: -15
+            },
+            {
+                id: 8,
+                title: "Community Fund",
+                description: "Donate 5% of profits to local causes and publicize impact.",
+                cost: 2,
+                pillar: 3,
+                trust: 10,
+                profit: -10
+            },
+            {
+                id: 9,
+                title: "Wellness Program",
+                description: "Launch complementary wellness tools alongside gambling products.",
+                cost: 3,
+                pillar: 3,
+                trust: 15,
+                profit: -8
+            },
+            {
+                id: 10,
+                title: "Player Community",
+                description: "Create forums and social spaces for players to connect and share experiences.",
+                cost: 2,
+                pillar: 4,
+                trust: 8,
+                profit: 0
+            },
+            {
+                id: 11,
+                title: "Transparency Report",
+                description: "Publish annual data on wins, losses, and responsible gambling interventions.",
+                cost: 3,
+                pillar: 4,
+                trust: 15,
+                profit: -5
+            },
+            {
+                id: 12,
+                title: "Customer Loyalty Program",
+                description: "Create a meaningful loyalty program that makes customers feel valued.",
+                cost: 3,
+                pillar: 4,
+                trust: 10,
+                profit: 5
+            }
+        ];
+        
+        // Challenges
+        const challenges = [
+            {
+                title: "Negative Media Coverage",
+                description: "A major newspaper publishes an exposé on the betting industry's impact on vulnerable players.",
+                effect: "Trust in all pillars decreases by 5%.",
+                apply: function() {
+                    for (let i = 1; i <= 4; i++) {
+                        gameState.pillars[i] = Math.max(0, gameState.pillars[i] - 5);
+                    }
+                    logEvent("All trust pillars decreased by 5% due to negative media coverage.");
+                }
+            },
+            {
+                title: "Regulatory Scrutiny",
+                description: "The Gambling Commission announces increased scrutiny on marketing practices.",
+                effect: "Ethics & Integrity trust decreases by 10%.",
+                apply: function() {
+                    gameState.pillars[2] = Math.max(0, gameState.pillars[2] - 10);
+                    logEvent("Ethics & Integrity trust decreased by 10% due to regulatory scrutiny.");
+                }
+            },
+            {
+                title: "Technical Outage",
+                description: "A major sporting event causes platform issues across the industry.",
+                effect: "Product & Play Experience trust decreases by 15%.",
+                apply: function() {
+                    gameState.pillars[1] = Math.max(0, gameState.pillars[1] - 15);
+                    logEvent("Product & Play Experience trust decreased by 15% due to technical outage.");
+                }
+            },
+            {
+                title: "Industry Scandal",
+                description: "A competitor is found to have rigged game outcomes, causing spillover effects.",
+                effect: "Trust in all pillars decreases by 10%.",
+                apply: function() {
+                    for (let i = 1; i <= 4; i++) {
+                        gameState.pillars[i] = Math.max(0, gameState.pillars[i] - 10);
+                    }
+                    logEvent("All trust pillars decreased by 10% due to industry scandal.");
+                }
+            },
+            {
+                title: "Positive Media Coverage",
+                description: "An industry publication highlights innovative responsible gambling tools.",
+                effect: "Societal Contribution trust increases by 5%.",
+                apply: function() {
+                    gameState.pillars[3] = Math.min(100, gameState.pillars[3] + 5);
+                    logEvent("Societal Contribution trust increased by 5% due to positive media coverage.");
+                }
+            },
+            {
+                title: "Market Growth",
+                description: "Overall market growth brings new customers to the industry.",
+                effect: "Customer base increases by 10%.",
+                apply: function() {
+                    gameState.customers = Math.floor(gameState.customers * 1.1);
+                    logEvent("Customer base increased by 10% due to market growth.");
+                }
+            },
+            {
+                title: "Economic Downturn",
+                description: "An economic downturn causes players to be more cautious with their spending.",
+                effect: "Profit decreases by 10%.",
+                apply: function() {
+                    gameState.profit = Math.floor(gameState.profit * 0.9);
+                    logEvent("Profit decreased by 10% due to economic downturn.");
+                }
+            },
+            {
+                title: "Competitor Innovation",
+                description: "A competitor launches a transparent RTP tracker that gains media attention.",
+                effect: "Community Engagement trust decreases by 5%.",
+                apply: function() {
+                    gameState.pillars[4] = Math.max(0, gameState.pillars[4] - 5);
+                    logEvent("Community Engagement trust decreased by 5% due to competitor innovation.");
+                }
+            }
+        ];
+        
+        // Insights for feedback
+        const insights = [
+            "Trust is built gradually but can be lost rapidly.",
+            "Balancing all four trust pillars is more effective than excelling in just one.",
+            "Short-term profit often comes at the expense of long-term trust.",
+            "Transparency initiatives yield the greatest trust returns.",
+            "Customer support quality directly impacts trust retention.",
+            "Physical presence creates a halo effect of reliability.",
+            "Media coverage shapes public perception beyond direct customer experience.",
+            "Withdrawals and payment experiences are critical trust moments.",
+            "Industry-wide collaboration can raise standards for all.",
+            "Customers seek validation that their betting hobby is shared by a broader community."
+        ];
+        
+        // Customer feedback data
+        const feedbackByPillar = {
+            1: { // Product & Play Experience
+                high: [
+                    "I love how transparent you are with the RTP stats. Makes me feel like I understand the odds.",
+                    "Same-day withdrawals? That's amazing! Most sites make you wait for ages.",
+                    "The platform feels secure and reliable. I've never experienced any glitches."
+                ],
+                medium: [
+                    "Your games seem fair enough, but I'd appreciate more transparency on how they work.",
+                    "Withdrawals are reasonably quick, but could be faster.",
+                    "The platform is stable most of the time, but occasionally has issues."
+                ],
+                low: [
+                    "I don't trust these games. Are they really fair?",
+                    "Why does it take so long to withdraw my winnings? Feels like you're trying to make me bet it all back.",
+                    "The site keeps crashing during big ev
